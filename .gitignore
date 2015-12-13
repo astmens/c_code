@@ -1,0 +1,28 @@
+# ignore all files ending with ~ and ignore it anywhere in the subdirectory:
+*~
+**/*~
+
+# NO... never mind - ignore EVERYTHING
+*
+# EXCEPT source files, Makefile's and folders
+!*.c
+!Makefile
+!Makefile.win
+!*/
+!.gitignore
+
+# Ignore Packages:
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+# Ignore Windows files:
+Thumbs.db
+desktop.ini
+
+

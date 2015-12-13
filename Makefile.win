@@ -1,0 +1,16 @@
+CC = gcc
+
+#Recommended flags:
+CFLAGS = -Wall -pedantic -std=c99
+#CFLAGS2 = -Wtraditional -Wshadow -Wpointer-arith -Wcast-qual -Wcast-align -Wstrict-prototypes -Wmissing-prototypes -Wconversion 
+CFLAGS2 = -Wshadow -Wpointer-arith -Wcast-qual -Wcast-align -Wstrict-prototypes -Wmissing-prototypes -Wconversion
+DEPS = 
+
+SRCS = $(wildcard *.c)
+EXES = $(SRCS:.c=.exe)
+
+all: $(EXES)
+
+
+%.exe:	%.c $(DEPS)
+	$(CC) $< -o $@ $(CFLAGS) $(CFLAGS2)
