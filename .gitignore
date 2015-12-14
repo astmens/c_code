@@ -10,6 +10,8 @@
 !Makefile.win
 !*/
 !.gitignore
+!*.py
+!*.txt
 
 # Ignore Packages:
 *.7z

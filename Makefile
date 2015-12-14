@@ -17,6 +17,6 @@ all: $(EXES)
 	$(CC) $< -o $@ $(CFLAGS) $(CFLAGS2) $(DEBUGFLG)
 
 clean:
-	rm -f $(EXES)
+	rm -f $(EXES) *~
 
 .Phony: clean

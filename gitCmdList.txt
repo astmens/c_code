@@ -1,0 +1,12 @@
+git status
+
+git add -A
+
+git commit -am "Initial commit for C language study project"
+
+git remote add C_code https://astmens.visualstudio.com/DefaultCollection/_git/C_code
+
+git push -u C_code --all
+
+git commit --amend --no-edit
+
