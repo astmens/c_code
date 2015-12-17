@@ -12,6 +12,7 @@
 !.gitignore
 !*.py
 !*.txt
+!*.sh
 
 # Ignore Packages:
 *.7z
