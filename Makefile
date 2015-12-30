@@ -1,22 +1,35 @@
 CC = gcc
 
 #Recommended flags:
-CFLAGS = -Wall -pedantic -std=c99
+CFLAGS1 = -Wall -pedantic -std=c99
 #CFLAGS2 = -Wtraditional -Wshadow -Wpointer-arith -Wcast-qual -Wcast-align -Wstrict-prototypes -Wmissing-prototypes -Wconversion 
 CFLAGS2 = -Wshadow -Wpointer-arith -Wcast-qual -Wcast-align -Wstrict-prototypes -Wmissing-prototypes -Wconversion
-DEBUGFLG = -g
-DEPS = 
+DEBUGFLAG = -g
 
-SRCS = $(wildcard *.c)
+DEPS = object.o
+
+CFLAGS = $(DEBUGFLAG) $(CFLAGS1) $(CFLAGS2)
+
+SRCS = $(wildcard ex*.c )
 EXES = $(SRCS:.c=)
 
-all: $(EXES)
+all: $(EXES) $(DEPS) 
 
+deps: $(DEPS) 
 
-%:	%.c $(DEPS)
-	$(CC) $< -o $@ $(CFLAGS) $(CFLAGS2) $(DEBUGFLG)
+# extra line for ex19, to add its specific dependencies:
+ex19: ex19.c object.o
+
+%:	%.c
+	$(CC) $^ -o $@ $(CFLAGS)
+	
+#	$(CC) $< -o $@ $(CFLAGS) $(CFLAGS2) $(DEBUGFALG)
 
 clean:
 	rm -f $(EXES) *~
 
-.Phony: clean
+list:
+	echo $(SRCS)
+
+.Phony: clean list
+

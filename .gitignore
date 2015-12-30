@@ -6,6 +6,7 @@
 *
 # EXCEPT source files, Makefile's and folders
 !*.c
+!*.h
 !Makefile
 !Makefile.win
 !*/
