@@ -26,7 +26,7 @@ ex19: ex19.c object.o
 #	$(CC) $< -o $@ $(CFLAGS) $(CFLAGS2) $(DEBUGFALG)
 
 clean:
-	rm -f $(EXES) *~
+	rm -f $(EXES) *~ *.o
 
 list:
 	echo $(SRCS)
