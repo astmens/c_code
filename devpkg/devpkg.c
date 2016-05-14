@@ -27,8 +27,8 @@ int main(int argc, const char const *argv[]){
 	enum CommandType request = COMMAND_NONE;
 	
 	rv = apr_getopt_init(&opt, p, argc, argv);
-
-	while(apr_getopt(opt, "I:L:c:m:i:d:S:F:B:", &ch, &optarg) == APR_SUCCESS) {
+	// opts	A string of characters that are acceptable options to the program. Characters followed by ":" are required to have an option associated
+	while(apr_getopt(opt, "I:Lc:m:i:d:SF:B:", &ch, &optarg) == APR_SUCCESS) {
 		switch(ch) {
 			case 'I':
 				request = COMMAND_INSTALL;
@@ -57,7 +57,8 @@ int main(int argc, const char const *argv[]){
 				request = COMMAND_BUILD;
 				url = optarg;
 				break;
-		}	
+		}
+		//debug("req: %d ch: %c, o: %s", request, ch, optarg);	// DEBUG
 	}
 	
 	switch(request) {

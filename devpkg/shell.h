@@ -10,12 +10,15 @@ typedef struct Shell {
 	const char *dir;
 	const char *exe;
 	
+	const int arg_repl; // Number of arguments to replace; Ch2; Overwritten if put at end of the struct!!!
+	
 	apr_procattr_t *attr;
 	apr_proc_t proc;
 	apr_exit_why_e exit_why;
 	int exit_code;
 	
 	const char *args[MAX_COMMAND_ARGS];
+	
 } Shell;
 
 int Shell_run(apr_pool_t *p, Shell *cmd);
