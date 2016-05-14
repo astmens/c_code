@@ -31,7 +31,7 @@ int main(int argc, char *argv[]){
 	printf("What's your First Name? ");
 	in = fgets(you.first_name, MAX_DATA-1, stdin);
 	// in = fscanf(stdin, "%50s", you.first_name);
-	//in = gets(you.first_name, MAX_DATA-1, stdin);
+	// in = gets(you.first_name); // never use gets!!! - it writes past buffer; valgrind ./ex24 < /dev/urandom
 	check(in != NULL, "Failed to read first name.%c", ' ');
 	
 	printf("What's your Last Name? ");
@@ -39,7 +39,7 @@ int main(int argc, char *argv[]){
 	check(in != NULL, "Failed to read last name.%c", ' ');
 	
 	printf("How old are you? ");
-	int rc = fscanf(stdin, "%d", &you.age);
+	int rc = fscanf(stdin, "%d", &you.age); // address to int in struct given to modify it
 	check(rc > 0, "You have to enter a number.%c", ' ');
 	
 	printf("What color are your eyes:\n");
