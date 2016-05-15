@@ -66,7 +66,7 @@ int DB_find(const char *url){
 	}
 	else { res = 1; }
 	
-error: // fallthough
+error: // fallthrough
 	if(data) { bdestroy(data); }
 	if(line) { bdestroy(line); }
 	
