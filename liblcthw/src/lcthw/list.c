@@ -1,11 +1,15 @@
 #include <lcthw/list.h>
 #include <lcthw/dbg.h>
 
+#include <assert.h>
+
 List *List_create() {
 	return calloc(1, sizeof(List));
 }
 
 void List_destroy(List *list) {
+	assert(list != NULL && "*list is Null.");
+	
 	LIST_FOREACH(list, first, next, cur) {
 		if(cur->prev) {
 			free(cur->prev);
@@ -17,6 +21,8 @@ void List_destroy(List *list) {
 }
 
 void List_clear(List *list) {
+	assert(list != NULL && "*list is Null.");
+	
 	LIST_FOREACH(list, first, next, cur) {
 		free(cur->value);
 	}
@@ -24,11 +30,25 @@ void List_clear(List *list) {
 
 
 void List_clear_destroy(List *list){
-	List_clear(list);
-	List_destroy(list);
+	//List_clear(list);
+	//List_destroy(list);
+	
+	assert(list != NULL && "*list is Null.");
+	
+	LIST_FOREACH(list, first, next, cur) {
+		if(cur->prev) {
+			free(cur->prev); // destroy
+		}
+		free(cur->value); // clear
+	}
+	
+	free(list->last); // destroy
+	free(list);	// destroy
 }
 
 void List_push(List *list, void *value){
+	assert(list != NULL && "*list is Null.");
+
 	ListNode *node = calloc(1, sizeof(ListNode));
 	check_mem(node);
 	node->value = value;
@@ -48,11 +68,15 @@ error:
 }
 
 void *List_pop(List *list){
+	assert(list != NULL && "*list is Null.");
+	
 	ListNode *node = list->last;
 	return node != NULL ? List_remove(list, node) : NULL;
 }
 
 void List_unshift(List *list, void *value){
+	assert(list != NULL && "*list is Null.");
+	
 	ListNode *node = calloc(1, sizeof(ListNode));
 	check_mem(node);
 	
@@ -73,11 +97,15 @@ error:
 }
 
 void *List_shift(List *list){
+	assert(list != NULL && "*list is Null.");
+	
 	ListNode *node = list->first;
 	return node != NULL ? List_remove(list, node) : NULL;
 }
 
 void *List_remove(List *list, ListNode *node){
+	assert(list != NULL && "*list is Null.");
+	
 	void *result = NULL;
 	
 	check(list->first && list->last, "List is empty.");

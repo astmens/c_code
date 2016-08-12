@@ -1,4 +1,5 @@
-CFLAGS=-g -O2 -Wall -Wextra -Isrc -rdynamic -DNDEBUG $(OPTFLAGS)
+#CFLAGS=-g -O2 -Wall -Wextra -Isrc -rdynamic -DNDEBUG $(OPTFLAGS)
+CFLAGS=-g -Wall -Wextra -Isrc -rdynamic -DNDEBUG $(OPTFLAGS)
 LIBS=-ldl $(OPTLIBS)
 PREFIX?=/usr/local
 
@@ -27,9 +28,9 @@ $(TARGET): build $(OBJECTS)
 $(SO_TARGET): $(TARGET) $(OBJECTS)
 	$(CC) -shared -o $@ $(OBJECTS)
 
-# my add: to solve linking error by wrong order
+# my add: to solve linking error by wrong order; TODO: improve upon make rule!
 $(TESTS): $(TEST_SRC) $(TARGET) Makefile
-	$(CC) -o $@ $< $(CFLAGS)
+	$(CC) -o $@ $(patsubst %,%.c,$@) $(CFLAGS)
 
 build:
 	@mkdir -p build
