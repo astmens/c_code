@@ -11,6 +11,7 @@ void List_destroy(List *list) {
 	assert(list != NULL && "*list is Null.");
 	
 	LIST_FOREACH(list, first, next, cur) {
+		//printf("prev: %x, cur: %x, next: %x \n", cur->prev, cur, cur->next);
 		if(cur->prev) {
 			free(cur->prev);
 		}
@@ -36,14 +37,16 @@ void List_clear_destroy(List *list){
 	assert(list != NULL && "*list is Null.");
 	
 	LIST_FOREACH(list, first, next, cur) {
+		
 		if(cur->prev) {
+			free(cur->prev->value); // clear
 			free(cur->prev); // destroy
 		}
-		free(cur->value); // clear
 	}
-	
+	free(list->last->value); // clear
 	free(list->last); // destroy
 	free(list);	// destroy
+	
 }
 
 void List_push(List *list, void *value){

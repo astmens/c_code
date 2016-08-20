@@ -46,6 +46,7 @@ void *List_remove(List *list, ListNode *node);
 #define LIST_FOREACH(L, S, M, V) ListNode *_node = NULL; \
 	ListNode *V = NULL; \
 	for (V = _node = L->S; _node != NULL; V = _node = _node->M)
+	// L - list, s - first, M - next, V - cur
 
 
 #endif

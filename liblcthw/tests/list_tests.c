@@ -22,7 +22,7 @@ char *test_create(){
 }
 
 char *test_destroy() {
-	List_clear_destroy(list);
+	List_destroy(list); // building without -O2 flag makes this fail if values of nodes are on stack!
 	return NULL;
 }
 

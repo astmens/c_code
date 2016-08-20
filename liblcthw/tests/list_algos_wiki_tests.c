@@ -5,56 +5,101 @@
 #include <stdio.h>
 #include <assert.h>
 #include "lcthw/dbg.h"
-
-char listArr0[] = {'a', 'b', 'c', 'd', 'e'}; 	// define as 'char' CHAR_LIST; TODO: make it flexible
-int listArr1[] = {5, 1, 4, 2, 8}; 				// define as 'int' INT_LIST; TODO: make it flexible
-double listArr2[] = {5.0, 1.0, 4.0, 2.0, 8.0}; 	// define as 'double' DOUBLE_LIST; TODO: make it flexible
-char *listArr3[] = {"5_", "10<", "(>4<)", "2-)", "8"}; 	// define as 'string' STRING_LIST; TODO: make it flexible
-
-// int list_size0 = sizeof listArr0 / sizeof *listArr0;  // works only with non-void pointers
-// int list_size1 = sizeof listArr1 / sizeof *listArr1;
-// int list_size2 = sizeof listArr2 / sizeof *listArr2;
-// int list_size3 = sizeof listArr3 / sizeof *listArr3;
-#define SIZE_OF_LIST(X) sizeof X / sizeof *X 
-
 /* 
+valgrind --leak-check=full -v ./tests/list_algos_wiki_tests
+
+gdb ./tests/list_algos_wiki_tests
 
 b tests/list_algos_wiki_tests.c:23
 b src/lcthw/list_algos_wiki.c:43
 
 */
 
-void *list_algos_test(){ // break list_algos_test
-//	mu_assert(listArr, "There must be an array. ");
-	
-//	int pnt_size = (sizeof *listArr) >> 2; // 
-//	int pnt_size2 = (sizeof *listArr2) >> 2; // 
-//	int pnt_size3 = (sizeof *listArr3) >> 2; // 
-//	int list_size = sizeof listArr / sizeof *listArr; // works only with non-void pointers
-	assert(sizeof(void*) == sizeof(long)); // will store pointer addresses as long array, but long is platform specific...
-	
-	// setup list, its size and type:
-	/// void *listArr = listArr3;						// SET the list pointer
-	int list_size = SIZE_OF_LIST(listArr3); // works only with non-void pointers
-	enum List_types list_type = STRING_LIST;			// SET the type of list used
+char listArr0[] = {'a', 'b', 'c', 'd', 'e'}; 	// define as 'char' CHAR_LIST; TODO: make it flexible
+int listArr1[] = {10, 50, 1, 4, 2, 8}; 				// define as 'int' INT_LIST; TODO: make it flexible
+double listArr2[] = {5.0, 1.0, 4.0, 2.0, 8.0}; 	// define as 'double' DOUBLE_LIST; TODO: make it flexible
+char *listArr3[] = {"5_", "10<", "(>4<)", "2-)", "8"}; 	// define as 'string' STRING_LIST; TODO: make it flexible
 
-	long *longListArr = (long *)malloc(list_size*sizeof(long));
+
+// define name of the list and its type
+#define LIST_NAME listArr2
+#define LIST_TYPE DOUBLE_LIST		// needed for dereferencing: printing and comparing
+#define LIST_TYPE_CAST (LIST_TYPE *) // TODO: possible idea for improvement
+
+#define SIZE_OF_LIST(X) sizeof X / sizeof *X // works only with non-void pointers
+
+// some quick and dirty globals:
+long *longListArr;
+enum List_types list_type;
+int list_size;
+
+List *create_list_from_array(){
+	check(sizeof(void*) <= sizeof(long), "Check if 'void*' can be stored as 'long'"); // will store pointer addreses as long array, but long is platform specific...
+	
+	// setup list's size and type:
+	list_size = SIZE_OF_LIST(LIST_NAME); // works only with non-void pointers
+	list_type = LIST_TYPE;			// SET the type of list used
+	longListArr = (long *)calloc(1, list_size*sizeof(long)); // global!
 	int i = 0;
 	
 	for(i = 0; i < list_size; i++){
-		longListArr[i] = (long )&(listArr3[i]);
+		longListArr[i] = (long )&(LIST_NAME[i]);
 	}
+	List *list = List_create_from_longArr(longListArr, list_size);
+	//List_print(list, list_type);
+	check(list, "List not created. ");
 	
-	/// printf("listArr: %p, listArr1: %p, longListArr: %lx \n", &listArr, &listArr1, longListArr[0]);
-	/// debug("%p @ ListArr, [0]: %x \n", &listArr, *(int*)listArr);
+	return list;
 	
-	/// List *list = List_create_from_arr(listArr, list_size, list_type); // TODO: make it flexible
-	List *list2 = List_create_from_longArr(longListArr, list_size, list_type);
-	
-	mu_assert(list2, "List not created. ");
-	
-	free(longListArr);
+error:
 	return NULL;
+}
+
+void free_list(List *list){
+	List_destroy(list);	// only allocation done was for list, but not it's values; clear not needed!
+	free(longListArr);
+	return;
+}
+
+void *list_algos_test(){ // break list_algos_test
+
+	List *list = create_list_from_array();
+	mu_assert(list, "List not created. ");
+	/*
+	List_destroy(list);
+	
+	printf("Second time of list:\n");
+	list = List_create_from_longArr(longListArr, list_size, list_type);	
+	mu_assert(list, "List not created. ");
+	*/
+	
+	debug("Swap test %d\n", 1);
+	List_swap_w_prev_node(list, list->first->next);
+	// List_print(list, list_type); // visual check...
+	debug("Bubble sort test %d\n", 1);
+	int times = List_sort_bubble(list, list_type);
+	debug("Pass times: %d\n", times);
+	// List_print(list, list_type);	// visual check
+	//printf("p->p: %x, p: %x, n->p: %x, p->n:%x, n: %x, n->n:%x\n",
+	//	list->first->prev, list->first, list->first->next->prev, list->first->next, list->first->next, list->first->next->next);
+	
+	/// make the test fail by swaping first with second, which are different:
+	// List_swap_w_prev_node(list, list->first->next);
+	
+	/// test if sorted: (by trying to sort again)
+	times = List_sort_bubble(list, list_type);
+	mu_assert(times == 1, "List not sorted!");
+	List_print(list, list_type);	// visual check
+
+	
+	/// Clean-up:
+	free_list(list);
+	//List_clear_destroy(list); // core dumped... because it trys to free the pointer from stack?
+	//List_destroy(list);	// only allocation done was for list, but not it's values; clear not needed!
+	//free(longListArr);
+	return NULL;
+//error:
+//	return "Failed this test!";
 }
 
 void *all_algos_tests(){
@@ -68,3 +113,4 @@ void *all_algos_tests(){
 }
 
 RUN_TESTS(all_algos_tests);
+
