@@ -22,33 +22,55 @@ char *listArr3[] = {"5_", "10<", "(>4<)", "2-)", "8"}; 	// define as 'string' ST
 
 
 // define name of the list and its type
-#define LIST_NAME listArr2
-#define LIST_TYPE DOUBLE_LIST		// needed for dereferencing: printing and comparing
+#define LIST_NAME listArr1
+#define LIST_TYPE INT_LIST		// needed for dereferencing: printing and comparing
 #define LIST_TYPE_CAST (LIST_TYPE *) // TODO: possible idea for improvement
 
 #define SIZE_OF_LIST(X) sizeof X / sizeof *X // works only with non-void pointers
 
 // some quick and dirty globals:
-long *longListArr;
-enum List_types list_type;
+size_t *size_tListArr;
+//enum List_types list_type;
 int list_size;
 
+/** Make linked list from array of int's. Array pointer and its length must be provided.*/
+List *intArrayToLinkedList(int *a, size_t list_size){
+	check(a != NULL, "Size must be positive");
+	check(list_size > 0, "Size must be positive");
+	
+	unsigned int i = 0;
+	void *val = NULL;
+	
+	List *list = List_create();
+	check(list, "List not created. ");
+	List_set_type(list, INT_LIST);
+	for(i = 0; i < list_size; i++) {
+		val = (&a[i]); // store addresses instead of values; dereferencing!!! (type specific!)
+		List_push(list, val);
+	}
+	return list;
+
+error:
+	return NULL;
+}
+
+
 List *create_list_from_array(){
-	check(sizeof(void*) <= sizeof(long), "Check if 'void*' can be stored as 'long'"); // will store pointer addreses as long array, but long is platform specific...
+	check(sizeof(void*) <= sizeof(size_t), "Check if 'void*' can be stored as 'size_t'"); // will store pointer addresses as size_t array, but size_t is platform specific...
 	
 	// setup list's size and type:
 	list_size = SIZE_OF_LIST(LIST_NAME); // works only with non-void pointers
-	list_type = LIST_TYPE;			// SET the type of list used
-	longListArr = (long *)calloc(1, list_size*sizeof(long)); // global!
+	//list_type = LIST_TYPE;			// SET the type of list used
+	size_tListArr = (size_t *)calloc(1, list_size*sizeof(size_t)); // global!
 	int i = 0;
 	
 	for(i = 0; i < list_size; i++){
-		longListArr[i] = (long )&(LIST_NAME[i]);
+		size_tListArr[i] = (size_t )&(LIST_NAME[i]);
 	}
-	List *list = List_create_from_longArr(longListArr, list_size);
-	//List_print(list, list_type);
+	List *list = List_create_from_size_tArr(size_tListArr, list_size);
+	//List_print(list, list->list_type);
 	check(list, "List not created. ");
-	
+	list->listType = LIST_TYPE;
 	return list;
 	
 error:
@@ -57,7 +79,7 @@ error:
 
 void free_list(List *list){
 	List_destroy(list);	// only allocation done was for list, but not it's values; clear not needed!
-	free(longListArr);
+	free(size_tListArr);
 	return;
 }
 
@@ -69,7 +91,7 @@ void *list_algos_test(){ // break list_algos_test
 	List_destroy(list);
 	
 	printf("Second time of list:\n");
-	list = List_create_from_longArr(longListArr, list_size, list_type);	
+	list = List_create_from_size_tArr(size_tListArr, list_size, list_type);	
 	mu_assert(list, "List not created. ");
 	*/
 	
@@ -77,7 +99,7 @@ void *list_algos_test(){ // break list_algos_test
 	List_swap_w_prev_node(list, list->first->next);
 	// List_print(list, list_type); // visual check...
 	debug("Bubble sort test %d\n", 1);
-	int times = List_sort_bubble(list, list_type);
+	int times = List_sort_bubble(list, list->listType);
 	debug("Pass times: %d\n", times);
 	// List_print(list, list_type);	// visual check
 	//printf("p->p: %x, p: %x, n->p: %x, p->n:%x, n: %x, n->n:%x\n",
@@ -87,19 +109,55 @@ void *list_algos_test(){ // break list_algos_test
 	// List_swap_w_prev_node(list, list->first->next);
 	
 	/// test if sorted: (by trying to sort again)
-	times = List_sort_bubble(list, list_type);
+	times = List_sort_bubble(list, list->listType);
 	mu_assert(times == 1, "List not sorted!");
-	List_print(list, list_type);	// visual check
+	List_print(list, list->listType);	// visual check
 
 	
 	/// Clean-up:
 	free_list(list);
 	//List_clear_destroy(list); // core dumped... because it trys to free the pointer from stack?
 	//List_destroy(list);	// only allocation done was for list, but not it's values; clear not needed!
-	//free(longListArr);
+	//free(size_tListArr);
 	return NULL;
 //error:
 //	return "Failed this test!";
+}
+
+void *arrayMeregeIntTest(){
+	int a[] = {38, 27, 43, 3, 9, 82, 10};
+	int b[] = {38, 27, 43, 3, 9, 82, 10};	// temp 
+	int n = SIZE_OF_LIST(a);
+	int k = 0;
+	topDownMergeSortInt(a, b, n);
+	for (k = 0; k < n; k++){
+		printf("a[%d]=%d ", k, a[k]);
+	}
+	printf("\n");
+
+	return NULL;
+
+}
+
+void *listMergeIntTest(){
+
+	int a[] = {38, 27, 43, 3, 9, 82, 10};
+	int b[] = {38, 27, 43, 3, 9, 82, 10};	// temp 
+	int n = SIZE_OF_LIST(a);
+	List *list = intArrayToLinkedList(a, n);
+	List *listTmp = intArrayToLinkedList(a, n);
+	
+	
+	List_print(listTmp, INT_LIST);
+	//topDownMergeSortInt(a, b, n);	
+	topDownMergeSortList(list, listTmp, n);
+	printf("sorted list: \n");
+	List_print(list, INT_LIST);
+	List_print(listTmp, INT_LIST);
+	
+	List_destroy(list);	// only allocation done was for list, but not it's values; clear not needed!
+	List_destroy(listTmp);	// only allocation done was for list, but not it's values; clear not needed!
+	return NULL;
 }
 
 void *all_algos_tests(){
@@ -107,7 +165,11 @@ void *all_algos_tests(){
 	
 	mu_run_test(list_algos_test);
 	
-	printf("Tests over!");
+	mu_run_test(arrayMeregeIntTest);
+	
+	mu_run_test(listMergeIntTest);
+	
+	printf("Tests over!\n");
 	
 	return NULL;
 }

@@ -7,6 +7,13 @@ List *List_create() {
 	return calloc(1, sizeof(List));
 }
 
+void List_set_type(List *list, enum ListTypes list_type){
+	list->listType = list_type;
+}
+enum ListTypes List_get_type(List *list){
+	return list->listType;
+}
+
 void List_destroy(List *list) {
 	assert(list != NULL && "*list is Null.");
 	

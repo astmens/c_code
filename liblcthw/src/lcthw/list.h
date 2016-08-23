@@ -3,6 +3,15 @@
 
 #include <stdlib.h>
 
+#define FALSE	0
+#define TRUE	1
+enum ListTypes {
+	CHAR_LIST,
+	INT_LIST,
+	DOUBLE_LIST,
+	STRING_LIST
+};
+
 struct ListNode;
 
 typedef struct ListNode {
@@ -15,10 +24,15 @@ typedef struct List {
 	int count;
 	ListNode *first;
 	ListNode *last;
+	enum ListTypes listType; // my add
 } List;
 
 /** Allocate memory for the list structure */
 List *List_create();
+/** Set type of the list for dereferencing */
+void List_set_type(List *list, enum ListTypes list_type);
+/** Get type of the list */
+enum ListTypes List_get_type(List *list);
 /** Free the allocated memory of list and every its member */
 void List_destroy(List *list);
 /** Free the values of the each node on the list, while keeping the list and nodes */
