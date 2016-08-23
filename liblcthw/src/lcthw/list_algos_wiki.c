@@ -109,7 +109,7 @@ int List_sort_bubble(List *list, enum ListTypes list_type){
 	
 
 	while(!sorted && i <= n){
-		debug("Sorting: %d\n", i);
+		//debug("Sorting: %d\n", i);
 		sorted = TRUE;
 		k = 0;
 		cur = list->first;
@@ -120,7 +120,7 @@ int List_sort_bubble(List *list, enum ListTypes list_type){
 			cur = nex;
 			nex = cur->next;
 			if (cur == NULL) { printf("something not as expected"); return -1;}
-			debug("%dof%d, p: %lx, c:%lx n:%lx ", k, n, (size_t)cur->prev, (size_t)cur, (size_t)cur->next);
+			//debug("%dof%d, p: %lx, c:%lx n:%lx ", k, n, (size_t)cur->prev, (size_t)cur, (size_t)cur->next); //src/lcthw/list_algos_wiki.c:123:4: warning: format '%lx' expects argument of type 'long unsigned int', but argument 8 has type 'unsigned int'[-Wformat]
 			// if there is something to compare and swap with previous is needed:
 			if( cur && cur->prev && List_node_cmp(cur->prev, cur, list_type)){
 				List_swap_w_prev_node(list, cur);
@@ -145,7 +145,7 @@ error:
 void List_swap_w_prev_node(List *list, ListNode *node){
 	ListNode *prev = node->prev;	// node - current; prev - previous
 	check(prev && node, "Need elements to swap. ");
-	debug("Swapping nodes %lx and %lx\n", (size_t)node->prev, (size_t)node);
+	//debug("Swapping nodes %lx and %lx\n", (size_t)node->prev, (size_t)node);
 	//printf("p->p: %x, p: %x, n->p: %x, p->n:%x, n: %x, n->n:%x\n",
 	//	prev->prev, prev, node->prev, prev->next, node, node->next);
 	
@@ -276,14 +276,16 @@ void topDownMergeSortList(List *listA, List *listB, int n){
 	return;
 }
 
+/** listA - list to sort; listB - temp list; iBegin - starting index of list node (incl.); iEnd - ending index of list node (NON-incl) */
 void topDownSplitMergeList(List *listA, int iBegin, int iEnd, List *listB){
 	if(iEnd - iBegin < 2) { return; } // if run size == 1, consider it sorted;
 	//recursively split runs into two halves until run size == 1,
 	// then merge them and return back up the call chain
-	int iMiddle = (iEnd + iBegin) / 2;
+	int iMiddle = ((iEnd + iBegin) / 2);
+	if ((iEnd - iBegin) % 2 == 1) { iMiddle++; } // if list is odd!!!
 	topDownSplitMergeList(listA, iBegin, iMiddle, listB);
 	topDownSplitMergeList(listA, iMiddle, iEnd, listB);
-	topDownMergeList(listB, iBegin, iMiddle, iEnd, listB);
+	topDownMergeList(listA, iBegin, iMiddle, iEnd, listB);
 	copyArrayList(listB, iBegin, iEnd, listA);
 	
 	return;

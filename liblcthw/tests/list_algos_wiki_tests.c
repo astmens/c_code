@@ -141,11 +141,11 @@ void *arrayMeregeIntTest(){
 
 void *listMergeIntTest(){
 
-	int a[] = {38, 27, 43, 3, 9, 82, 10};
-	int b[] = {38, 27, 43, 3, 9, 82, 10};	// temp 
+	int a[] = {38, 27, 43, 3, 9, 82, 10, 85, 74, 41, 21};
+	int b[] = { 0,  0,  0, 0, 0,  0,  0,  0,  0,  0,  0};	// temp 
 	int n = SIZE_OF_LIST(a);
 	List *list = intArrayToLinkedList(a, n);
-	List *listTmp = intArrayToLinkedList(a, n);
+	List *listTmp = intArrayToLinkedList(b, n);
 	
 	
 	List_print(listTmp, INT_LIST);
