@@ -1,5 +1,5 @@
 #include "lcthw/list_algos_wiki.h"
-#include <lcthw/dbg.h> // check(), ...
+#include "lcthw/dbg.h" // check(), ...
 
 #include <stdio.h> // printf
 
