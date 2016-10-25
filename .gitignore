@@ -14,6 +14,8 @@
 !*.py
 !*.txt
 !*.sh
+!README.md
+renameGitAuthor.sh
 
 # Ignore Packages:
 *.7z
