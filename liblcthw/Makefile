@@ -1,6 +1,6 @@
 # Made some adjustments for building with MS Visual Studio on Windows OS
-# @project properties (Alt + F7): 
-# General->Configuration Type->Makefile; 
+# @project properties (Alt + F7):
+# General->Configuration Type->Makefile;
 # Debugging->Command->tests\list_algos_wiki_tests.exe
 # NMake->General->Build Command line->make
 # NMake->General->Clean Command line->make clean
@@ -9,7 +9,7 @@
 
 #CFLAGS=-g -O2 -Wall -Wextra -Isrc -rdynamic -DNDEBUG $(OPTFLAGS)
 #CFLAGS=-g -Wall -Wextra -Isrc -Itests -Lbuild -Wl,--export-dynamic -export-dynamic $(OPTFLAGS)
-CFLAGS=-g -Wall -Wextra -Isrc -Itests -Lbuild -Wl,--export-all-symbols $(OPTFLAGS)
+CFLAGS=-g -Wall -Wextra -Isrc -Itests -Ibuild -Lbuild $(OPTFLAGS)
 LIBS=-ldl $(OPTLIBS)
 PREFIX?=/usr/local
 
@@ -40,24 +40,25 @@ SO_TARGET=$(patsubst %.a,%.so,$(MYLIBNAME))
 #The MYLIBNAME Build
 all: $(MYLIBNAME) $(SO_TARGET) $(TESTS)
 
-dev: CFLAGS=-g Wall Isrc -Wall -Wextra $(OPTFLAGS)
+#dev: CFLAGS=-g Wall Isrc -Wall -Wextra $(OPTFLAGS)
+dev: CFLAGS=-g -Wall -Wextra -Isrc -Itests -Ibuild -Lbuild $(OPTFLAGS)
 dev: all
 
 # need to compile our library source code into position-independent code (PIC)
-$(MYLIBNAME): CFLAGS += -fPIC
+$(MYLIBNAME): CFLAGS += -fPIC -Wl,--export-all-symbols
 # build our static library:
 $(MYLIBNAME): build $(OBJECTS)
 	ar rcs $@ $(OBJECTS)
 	ranlib $@
-	
+
 # build our shared library:
 $(SO_TARGET): $(MYLIBNAME) $(OBJECTS)
-	$(CC) $(OBJECTS) -shared -o $@ 
+	$(CC) $(OBJECTS) -shared -o $@
 
 # my add: to solve linking error by wrong order; TODO: improve upon make rule!
 $(TESTS): $(TEST_SRC) $(MYLIBNAME) Makefile
 ifeq ($(OS), Windows_NT)
-	$(CC) -o $@ $(patsubst %.exe,%.c,$@) $(CFLAGS) -Lbuild -l$(MYLIB) 
+	$(CC) -o $@ $(patsubst %.exe,%.c,$@) $(CFLAGS) -Lbuild -l$(MYLIB)
 else
 	$(CC) -o $@ $(patsubst %,%.c,$@) $(CFLAGS) -Lbuild -l$(MYLIB)
 endif
@@ -66,7 +67,7 @@ endif
 build:
 	@mkdir -p build
 	@mkdir -p bin
-	
+
 # The Unit Tests
 .Phony: tests
 tests: CFLAGS += $(MYLIBNAME)
@@ -75,7 +76,7 @@ tests: $(TESTS)
 
 valgrind:
 	VALGRIND="valgrind --log-file=/tmp/valgrind-%p.log" $(MAKE)
-	
+
 # The Cleaner
 clean:
 	rm -rf build $(OBJECTS) $(TESTS)
@@ -87,11 +88,9 @@ clean:
 install: all
 	install -d $(DESTDIR)/$(PREFIX)/lib/
 	install $(MYLIBNAME) $(DESTDIR)/$(PREFIX)/lib/
-	
+
 # The Checker
 BADFUNCS='[^_.>a-zA-Z0-9](str(n?cpy|n?cat|xfrm|n?dup|str|pbrk|tok|_)|stpn?cpy|a?sn?printf|byte_)'
 check:
 	@echo Files with potentially dangerous functions.
 	@egrep $(BADFUNCS) $(SOURCES) || true
-
-
